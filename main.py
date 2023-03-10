@@ -17,20 +17,26 @@ VALID_XS_STRING_RE = re.compile(
     r"^[\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\U00010000-\U0010FFFF]*$"
 )
 
+# Implement get_the_data_from_the_sensor() function
+def get_the_data_from_the_sensor():
+    return 10.0
 
+# Implement get_the_state_from_the_sensor() function
+def get_the_state_from_the_sensor():
+    return "Good"
 
 temperature = aas_types.Property(
-    value="10", #value=float_to_xs_float(get_the_data_from_the_sensor())
+    value=float_to_xs_float(get_the_data_from_the_sensor()),
     value_type=aas_types.DataTypeDefXsd.FLOAT,
     id_short="temperature"
 )
 
-state_value = get_the_state_from_the_sensor() # state_value = get_the_state_from_the_sensor()
+state_value = get_the_state_from_the_sensor()
 if VALID_XS_STRING_RE.match(state_value) is None:
     raise RuntimeError(f"Unexpected state value: {state_value}")
 
 state = aas_types.Property(
-    value="Good", # state0 value
+    value=state_value,
     id_short="state",
     value_type=aas_types.DataTypeDefXsd.STRING
 )
@@ -40,31 +46,43 @@ submodel_chiller_real_time = aas_types.Submodel(
     submodel_elements=[temperature, state]
 )
 
+# Add necessary properties to the submodel_elements list for submodel_chiller_static
+prop1 = aas_types.Property(
+    value="static_value1",
+    id_short="prop1",
+    value_type=aas_types.DataTypeDefXsd.STRING
+)
+prop2 = aas_types.Property(
+    value="42",
+    id_short="prop2",
+    value_type=aas_types.DataTypeDefXsd.INT
+)
 submodel_chiller_static = aas_types.Submodel(
     id="urn:zhaw:ims:chiller:543fsfds99342:static",
-    submodel_elements=[...]
+    submodel_elements=[prop1, prop2]
 )
 
 chiller = aas_types.AssetAdministrationShell(
     id="urn:zhaw:ims:chiller:543fsfds99342",
     submodels=[
-        aas_types.Reference(   # reference(type: reference types , keys:list[key], referred semantic id)
-            modelType=aas_types.ModelReference,
+        aas_types.Reference(
+            type=aas_types.ReferenceTypes.MODEL,
             keys=[
                 aas_types.Key(
-                    key_type=aas_types.KeyTypes.Submodel,
+                    key_type=aas_types.KeyTypes.SUBMODEL,
                     value="urn:zhaw:ims:chiller:543fsfds99342:realTime"
                 )
             ]
         ),
         aas_types.Reference(
-            modelType=aas_types.ModelReference,
+            type=aas_types.ReferenceTypes.MODEL,
             keys=[
                 aas_types.Key(
-                    key_type=aas_types.KeyTypes.Submodel,
+                    key_type=aas_types.KeyTypes.SUBMODEL,
                     value="urn:zhaw:ims:chiller:543fsfds99342:static"
                 )
             ]
         )
     ]
 )
+
