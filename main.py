@@ -64,25 +64,26 @@ submodel_chiller_static = aas_types.Submodel(
 
 chiller = aas_types.AssetAdministrationShell(
     id="urn:zhaw:ims:chiller:543fsfds99342",
+    asset_information=""
+
     submodels=[
         aas_types.Reference(
-            type=aas_types.ReferenceType.SUBMODEL,
+            type=aas_types.ReferenceTypes.SUBMODEL,
             keys=[
                 aas_types.Key(
-                    key_type=aas_types.KeyType.SUBMODEL,
+                    type=aas_types.KeyTypes.SUBMODEL,
                     value="urn:zhaw:ims:chiller:543fsfds99342:realTime"
                 )
             ]
         ),
         aas_types.Reference(
-            type=aas_types.ReferenceType.SUBMODEL,
+            type=aas_types.ReferenceTypes.SUBMODEL,
             keys=[
                 aas_types.Key(
-                    key_type=aas_types.KeyType.SUBMODEL,
+                    type=aas_types.KeyType.SUBMODEL,
                     value="urn:zhaw:ims:chiller:543fsfds99342:static"
                 )
             ]
         )
     ]
 )
-
