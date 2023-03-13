@@ -85,4 +85,3 @@ chiller = aas_types.AssetAdministrationShell(
         )
     ]
 )
-
