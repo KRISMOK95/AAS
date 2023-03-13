@@ -66,22 +66,23 @@ chiller = aas_types.AssetAdministrationShell(
     id="urn:zhaw:ims:chiller:543fsfds99342",
     submodels=[
         aas_types.Reference(
-            type=aas_types.ReferenceTypes.MODEL,
+            type=aas_types.ReferenceType.SUBMODEL,
             keys=[
                 aas_types.Key(
-                    key_type=aas_types.KeyTypes.SUBMODEL,
+                    key_type=aas_types.KeyType.SUBMODEL,
                     value="urn:zhaw:ims:chiller:543fsfds99342:realTime"
                 )
             ]
         ),
         aas_types.Reference(
-            type=aas_types.ReferenceTypes.MODEL,
+            type=aas_types.ReferenceType.SUBMODEL,
             keys=[
                 aas_types.Key(
-                    key_type=aas_types.KeyTypes.SUBMODEL,
+                    key_type=aas_types.KeyType.SUBMODEL,
                     value="urn:zhaw:ims:chiller:543fsfds99342:static"
                 )
             ]
         )
     ]
 )
+
