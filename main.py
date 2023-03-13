@@ -62,13 +62,19 @@ submodel_chiller_static = aas_types.Submodel(
     submodel_elements=[prop1, prop2]
 )
 
+asset_information = aas_types.AssetInformation(
+    asset_kind=aas_types.AssetKind.TYPE
+)
+
+
+
+
 chiller = aas_types.AssetAdministrationShell(
     id="urn:zhaw:ims:chiller:543fsfds99342",
-    asset_information=""
-
+    asset_information= asset_information ,
     submodels=[
         aas_types.Reference(
-            type=aas_types.ReferenceTypes.SUBMODEL,
+            type=aas_types.ReferenceTypes.MODEL_REFERENCE,
             keys=[
                 aas_types.Key(
                     type=aas_types.KeyTypes.SUBMODEL,
@@ -77,10 +83,10 @@ chiller = aas_types.AssetAdministrationShell(
             ]
         ),
         aas_types.Reference(
-            type=aas_types.ReferenceTypes.SUBMODEL,
+            type=aas_types.ReferenceTypes.MODEL_REFERENCE,
             keys=[
                 aas_types.Key(
-                    type=aas_types.KeyType.SUBMODEL,
+                    type=aas_types.KeyTypes.SUBMODEL,
                     value="urn:zhaw:ims:chiller:543fsfds99342:static"
                 )
             ]
