@@ -2,7 +2,6 @@ import aas_core3_rc02.types as aas_types
 import math
 import re
 
-# Hello world
 def float_to_xs_float(number: float) -> str:
     if math.isnan(number):
         return "NaN"
