@@ -63,7 +63,7 @@ submodel_chiller_static = aas_types.Submodel(
 )
 
 asset_information = aas_types.AssetInformation(
-    asset_kind=aas_types.AssetKind.TYPE
+    asset_kind=aas_types.AssetKind.TYPE # should be INSTANCE
 )
 
 
@@ -73,7 +73,7 @@ chiller = aas_types.AssetAdministrationShell(
     id="urn:zhaw:ims:chiller:543fsfds99342",
     asset_information= asset_information ,
     submodels=[
-        aas_types.Reference(
+        aas_types.Reference( #
             type=aas_types.ReferenceTypes.MODEL_REFERENCE,
             keys=[
                 aas_types.Key(
@@ -93,3 +93,6 @@ chiller = aas_types.AssetAdministrationShell(
         )
     ]
 )
+
+# the id: urn:"urn:zhaw:ims:chiller:S/N number :static" (like a link)
+# why FASTAPI required ?
