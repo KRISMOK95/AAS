@@ -1,5 +1,5 @@
 import json
-
+# Test is this command can see in my second PC
 import aas_core3_rc02.types as aas_types
 import aas_core3_rc02.jsonization as aas_jsonization
 
