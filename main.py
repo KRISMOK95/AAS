@@ -1,6 +1,8 @@
 import aas_core3_rc02.types as aas_types
 import math
 import re
+import aas_core3_rc02.jsonization as aas_jsonization
+import json
 
 def float_to_xs_float(number: float) -> str:
     if math.isnan(number):
@@ -93,6 +95,18 @@ chiller = aas_types.AssetAdministrationShell(
         )
     ]
 )
+
+# Prepare the environment
+environment = aas_types.Environment(
+    submodels=[submodel_chiller_real_time]
+)
+
+# Serialize to a JSON-able mapping
+jsonable = aas_jsonization.to_jsonable(environment)
+
+# Print the mapping as text
+print(json.dumps(jsonable, indent=2))
+
 
 # the id: urn:"urn:zhaw:ims:chiller:S/N number :static" (like a link)
 # why FASTAPI required ?
