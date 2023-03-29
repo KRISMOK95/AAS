@@ -97,6 +97,7 @@ chiller = aas_types.AssetAdministrationShell(
 )
 
 # Prepare the environment
+# environment = want to send the aas AS a Json file.
 environment = aas_types.Environment(
     submodels=[submodel_chiller_real_time]
 )
@@ -108,5 +109,9 @@ jsonable = aas_jsonization.to_jsonable(environment)
 print(json.dumps(jsonable, indent=2))
 
 
-# the id: urn:"urn:zhaw:ims:chiller:S/N number :static" (like a link)
-# why FASTAPI required ?
+
+#with FastAPI = enivronment is not needed it
+
+# get_value_only (fastapi.Body)
+
+# C# client
