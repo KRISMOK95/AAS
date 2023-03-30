@@ -3,6 +3,8 @@ import math
 import re
 import aas_core3_rc02.jsonization as aas_jsonization
 import json
+import paho.mqtt.client as mqtt
+import time
 
 def float_to_xs_float(number: float) -> str:
     if math.isnan(number):
@@ -19,16 +21,41 @@ VALID_XS_STRING_RE = re.compile(
     r"^[\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\U00010000-\U0010FFFF]*$"
 )
 
+# MQTT function
+MQTT_BROKER = "test.mosquitto.org"
+MQTT_TOPIC = "AAS/data"
+
+
+def on_message(client, userdata, message):
+    payload_str = message.payload.decode('utf-8')
+    received_data = json.loads(payload_str)
+    print(f"Received data from the Node-red script: {received_data}")
+
+    # Update the temperature and state properties with the new data
+    temperature.value = float_to_xs_float(received_data[0])
+    state.value = get_the_state_from_the_sensor()
+
+
+# Set up the MQTT client and connect to the broker
+client = mqtt.Client()
+client.connect(MQTT_BROKER, 1883)
+
+# Set up the callback function to be called when a message is received
+client.on_message = on_message
+
+# Subscribe to the MQTT topic
+client.subscribe(MQTT_TOPIC)
+
+# Start the MQTT client loop to listen for incoming messages
+client.loop_start()
 # Implement get_the_data_from_the_sensor() function
-def get_the_data_from_the_sensor():
-    return 10.0
 
 # Implement get_the_state_from_the_sensor() function
 def get_the_state_from_the_sensor():
     return "Good"
 
 temperature = aas_types.Property(
-    value=float_to_xs_float(get_the_data_from_the_sensor()),
+    value=float_to_xs_float(0.0),
     value_type=aas_types.DataTypeDefXsd.FLOAT,
     id_short="temperature"
 )
@@ -109,9 +136,9 @@ jsonable = aas_jsonization.to_jsonable(environment)
 print(json.dumps(jsonable, indent=2))
 
 
-
-#with FastAPI = enivronment is not needed it
-
-# get_value_only (fastapi.Body)
-
-# C# client
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("Terminating the script")
+    client.loop_stop()  # Stop the MQTT client loop
