@@ -23,16 +23,20 @@ VALID_XS_STRING_RE = re.compile(
 
 # MQTT function
 MQTT_BROKER = "test.mosquitto.org"
-MQTT_TOPIC = "AAS/data"
+MQTT_TOPIC = "academics/IoT"
 
 
 def on_message(client, userdata, message):
+    global temperature
     payload_str = message.payload.decode('utf-8')
     received_data = json.loads(payload_str)
     print(f"Received data from the Node-red script: {received_data}")
 
+    temp_value = received_data['data'][0]
+
     # Update the temperature and state properties with the new data
-    temperature.value = float_to_xs_float(received_data[0])
+    temperature.value = float_to_xs_float(temp_value)
+    print(temperature.value)
     state.value = get_the_state_from_the_sensor()
 
 
