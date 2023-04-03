@@ -5,7 +5,7 @@ import aas_core3_rc02.jsonization as aas_jsonization
 import json
 import paho.mqtt.client as mqtt
 import time
-
+import threading
 def float_to_xs_float(number: float) -> str:
     if math.isnan(number):
         return "NaN"
@@ -25,20 +25,30 @@ VALID_XS_STRING_RE = re.compile(
 MQTT_BROKER = "test.mosquitto.org"
 MQTT_TOPIC = "academics/IoT"
 
-
+received_data_global = None
+data_lock = threading.Lock()
 def on_message(client, userdata, message):
     global temperature
+    global received_data_global
     payload_str = message.payload.decode('utf-8')
     received_data = json.loads(payload_str)
     print(f"Received data from the Node-red script: {received_data}")
 
+    with data_lock:
+        received_data_global = received_data
+
     temp_value = received_data['data'][0]
+    current_data_property.value = json.dumps(received_data)
 
     # Update the temperature and state properties with the new data
     temperature.value = float_to_xs_float(temp_value)
-    print(temperature.value)
+    print(f"real-time tem value: {temperature.value}")
+    print(f"temp_value: {temp_value}")
     state.value = get_the_state_from_the_sensor()
 
+def get_received_data():
+    with data_lock:
+        return received_data_global
 
 # Set up the MQTT client and connect to the broker
 client = mqtt.Client()
@@ -74,10 +84,22 @@ state = aas_types.Property(
     value_type=aas_types.DataTypeDefXsd.STRING
 )
 
+####################### Submodel real time row data #############
+
+current_data_property = aas_types.Property(
+    value="{}",
+    id_short="realTimeRowData",
+    value_type=aas_types.DataTypeDefXsd.STRING
+)
+
 submodel_chiller_real_time = aas_types.Submodel(
     id="urn:zhaw:ims:chiller:543fsfds99342:realTime",
-    submodel_elements=[temperature, state]
+    submodel_elements=[temperature, state,current_data_property ]
 )
+
+
+
+
 
 ####################### Submodel identification ###############
 
@@ -301,6 +323,10 @@ print(json.dumps(jsonable, indent=3))
 
 try:
     while True:
+        current_data = get_received_data()
+        if current_data is not None:
+            print(f"global data: {current_data}")
+
         time.sleep(1)
 except KeyboardInterrupt:
     print("Terminating the script")
