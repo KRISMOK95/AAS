@@ -103,6 +103,8 @@ submodel_chiller_real_time = aas_types.Submodel(
 
 ####################### Submodel identification ###############
 
+
+
 identification_attributes = [
     {"value": "Thermo-chiller", "id_short": "name", "value_type": aas_types.DataTypeDefXsd.STRING},
     {"value": "Circulating Fluid Temperature Controller Thermo chiller", "id_short": "full_name", "value_type": aas_types.DataTypeDefXsd.STRING},
@@ -131,16 +133,16 @@ submodel_chiller_identification = aas_types.Submodel(
 ####################### Submodel identification end  #######################
 
 
-####################### Submodel standard Technical data ###############
+# region Submodel standard Technical data
 
 standard_technical_data_attributes = [
     {"value": "2.5", "id_short": "capacity_aic_ka", "value_type": aas_types.DataTypeDefXsd.FLOAT},
-    {"value": "30-70", "id_short": "humidity_range_percent", "value_type": aas_types.DataTypeDefXsd.STRING},
+    {"value": "30-70", "id_short": "humidity_range_percent", "value_type": aas_types.DataTypeDefXsd.STRING}, #AAS.TYPES.Range replace the property
     {"value": "3000", "id_short": "altitude_m", "value_type": aas_types.DataTypeDefXsd.INT},
-    {"value": "R410A (HFC)", "id_short": "refrigerant", "value_type": aas_types.DataTypeDefXsd.STRING},
+    {"value": "R410A (HFC)", "id_short": "refrigerant", "value_type": aas_types.DataTypeDefXsd.STRING}, # could link to another URL or website (aas_types.DataTypeDefXsd.AnyURI)
     {"value": "0.65", "id_short": "refrigerant_charge_kg", "value_type": aas_types.DataTypeDefXsd.FLOAT},
     {"value": "PID control", "id_short": "control_method", "value_type": aas_types.DataTypeDefXsd.STRING},
-    {"value": "65/68", "id_short": "noise_level_50Hz_60Hz_dB", "value_type": aas_types.DataTypeDefXsd.STRING},
+    {"value": "65/68", "id_short": "noise_level_50Hz_60Hz_dB", "value_type": aas_types.DataTypeDefXsd.STRING}, #sperate the 50 and 60 Hz
 ]
 
 
@@ -157,15 +159,15 @@ submodel_chiller_standard_technical_data = aas_types.Submodel(
     submodel_elements=submodel_standard_technical_data_elements
 )
 
-####################### Submodel standard Technical data end  #######################
+#endregion
 
 ####################### Submodel standard circulating fluid system data ###############
 
 standard_circulating_fluid_system_data_attributes = [
     {"value": "Tap water", "id_short": "circulating_fluid", "value_type": aas_types.DataTypeDefXsd.STRING},
     {"value": "5-40", "id_short": "set_temperature_range_celsius", "value_type": aas_types.DataTypeDefXsd.STRING},
-    {"value": "4700/5100", "id_short": "cooling_capacity_50Hz_60Hz_watt", "value_type": aas_types.DataTypeDefXsd.STRING},
-    {"value": "1100/1400", "id_short": "heating_capacity_50Hz_60Hz_watt", "value_type": aas_types.DataTypeDefXsd.STRING},
+    {"value": "4700/5100", "id_short": "cooling_capacity_50Hz_60Hz_watt", "value_type": aas_types.DataTypeDefXsd.STRING}, #sep 50 /60 and string -> int
+    {"value": "1100/1400", "id_short": "heating_capacity_50Hz_60Hz_watt", "value_type": aas_types.DataTypeDefXsd.STRING}, # the unit can be outside (remind Markco)
     {"value": "0.1", "id_short": "temperature_stability", "value_type": aas_types.DataTypeDefXsd.FLOAT},
     {"value": "23 (0.24 MPa)/28 (0.32 MPa)", "id_short": "pump_rated_flow_50Hz_60Hz_lmin", "value_type": aas_types.DataTypeDefXsd.STRING},
     {"value": "31/42", "id_short": "pump_max_flow_rate_50Hz_60Hz_lmin", "value_type": aas_types.DataTypeDefXsd.STRING},
@@ -193,7 +195,7 @@ submodel_chiller_standard_circulating_fluid_system_data = aas_types.Submodel(
 
 ####################### Submodel standard electrical system data ###############
 
-standard_electrical_system_data_attributes = [
+standard_electrical_system_data_attributes = [ # TODO: follow the comment above
     {"value": "200-230", "id_short": "power_supply_50Hz_60Hz_vac", "value_type": aas_types.DataTypeDefXsd.STRING},
     {"value": "20", "id_short": "circuit_protector_a", "value_type": aas_types.DataTypeDefXsd.FLOAT},
     {"value": "20", "id_short": "applicable_earth_leakage_breaker_capacity_a", "value_type": aas_types.DataTypeDefXsd.FLOAT},
