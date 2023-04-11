@@ -35,21 +35,33 @@ MQTT_TOPIC = "academics/IoT"
 
 received_data_global = None
 data_lock = threading.Lock()
-def on_message(current_data_property, client, userdata, message):
+
+realtime_row_data_property = aas_types.Property(
+    value="{}",
+    id_short="realTimeRowData",
+    value_type=aas_types.DataTypeDefXsd.STRING
+)
+def on_message(client, userdata, message):
     global temperature
     global received_data_global
+    global realtime_row_data_property
+
     payload_str = message.payload.decode('utf-8')
     received_data = json.loads(payload_str)
-    print(f"Received data from the Node-red script: {received_data}")
+    print(f"Received data from the Node-red script: {received_data}") # with types
+    print(f"Received data from the Node-red script ( only data ) : {received_data['data']}")
+
+    row_data = received_data['data']
+    temp_value = received_data['data'][0]
 
     with data_lock:
         received_data_global = received_data
+        realtime_row_data_property.value = json.dumps(row_data)
 
-    temp_value = received_data['data'][0]
-    current_data_property.value = json.dumps(received_data)
 
     # Update the temperature and state properties with the new data
     temperature.value = float_to_xs_float(temp_value)
+    print(f"row data: {row_data}")
     print(f"real-time tem value: {temperature.value}")
     print(f"temp_value: {temp_value}")
     state.value = get_the_state_from_the_sensor()
@@ -63,7 +75,7 @@ client = mqtt.Client()
 client.connect(MQTT_BROKER, 1883)
 
 # Set up the callback function to be called when a message is received
-client.on_message = functools.partial(on_message, current_data_property)
+client.on_message = on_message
 
 # Subscribe to the MQTT topic
 client.subscribe(MQTT_TOPIC)
@@ -93,16 +105,19 @@ state = aas_types.Property(
 #endregion
 
 #region Submodel real time row data
-
-current_data_property = aas_types.Property(
-    value="{}",
+'''
+realtime_row_data_property = aas_types.Property(
+    value= ,
     id_short="realTimeRowData",
     value_type=aas_types.DataTypeDefXsd.STRING
 )
+'''
+#endregion
 
+# region real time data example submodel
 submodel_chiller_real_time = aas_types.Submodel(
     id="urn:zhaw:ims:chiller:543fsfds99342:realTime",
-    submodel_elements=[temperature, state,current_data_property ]
+    submodel_elements=[temperature, state, realtime_row_data_property]
 )
 
 #endregion
@@ -128,11 +143,13 @@ def get_realtime_values():
 def update_thread() -> None:
     # List of submodels with real-time values
     realtime_submodels = [
+        '''
         submodel_chiller_row_realtime_data,
         submodel_chiller_operation_realtime_data,
         submodel_chiller_status_flag_realtime_data,
         submodel_chiller_alarm_flag_realtime_data,
         submodel_chiller_fault_realtime_data
+        '''
     ]
 
     while True:
