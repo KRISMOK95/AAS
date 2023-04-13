@@ -5,12 +5,6 @@ import aas_core3_rc02.jsonization as aas_jsonization
 import json
 import paho.mqtt.client as mqtt
 import time
-import threading
-import logging
-import functools
-
-
-
 
 #region float to xs float
 def float_to_xs_float(number: float) -> str:
@@ -31,66 +25,25 @@ VALID_XS_STRING_RE = re.compile(
 
 #region MQTT function
 MQTT_BROKER = "test.mosquitto.org"
-MQTT_TOPIC = "academics/IoT"
-
-received_data_global = None
-data_lock = threading.Lock()
-
-realtime_row_data_property = aas_types.Property(
-    value="{}",
-    id_short="realTimeRowData",
-    value_type=aas_types.DataTypeDefXsd.STRING
-)
-def on_message(client, userdata, message):
-    global temperature
-    global received_data_global
-    global realtime_row_data_property
-
-    payload_str = message.payload.decode('utf-8')
-    received_data = json.loads(payload_str)
-    print(f"Received data from the Node-red script: {received_data}") # with types
-    print(f"Received data from the Node-red script ( only data ) : {received_data['data']}")
-
-    row_data = received_data['data']
-    temp_value = received_data['data'][0]
-
-    with data_lock:
-        received_data_global = received_data
-        realtime_row_data_property.value = json.dumps(row_data)
-
-
-    # Update the temperature and state properties with the new data
-    temperature.value = float_to_xs_float(temp_value)
-    print(f"row data: {row_data}")
-    print(f"real-time tem value: {temperature.value}")
-    print(f"temp_value: {temp_value}")
-    state.value = get_the_state_from_the_sensor()
-
-def get_received_data():
-    with data_lock:
-        return received_data_global
-
-# Set up the MQTT client and connect to the broker
-client = mqtt.Client()
-client.connect(MQTT_BROKER, 1883)
-
-# Set up the callback function to be called when a message is received
-client.on_message = on_message
-
-# Subscribe to the MQTT topic
-client.subscribe(MQTT_TOPIC)
-
-# Start the MQTT client loop to listen for incoming messages
-client.loop_start()
+MQTT_TOPIC = "example/topic"
 
 # Implement get_the_state_from_the_sensor() function
 def get_the_state_from_the_sensor():
     return "Good"
 
 temperature = aas_types.Property(
-    value=float_to_xs_float(0.0),
+    value=float_to_xs_float(216.0),
     value_type=aas_types.DataTypeDefXsd.FLOAT,
-    id_short="temperature"
+    id_short="temperature",
+    semantic_id=aas_types.Reference(
+        type=aas_types.ReferenceTypes.MODEL_REFERENCE,
+        keys=[
+            aas_types.Key(
+                type=aas_types.KeyTypes.CONCEPT_DESCRIPTION,
+                value="urn:zhaw:conceptDescription:temperature"
+            )
+        ]
+    )
 )
 
 state_value = get_the_state_from_the_sensor()
@@ -104,74 +57,13 @@ state = aas_types.Property(
 )
 #endregion
 
-#region Submodel real time row data
-'''
-realtime_row_data_property = aas_types.Property(
-    value= ,
-    id_short="realTimeRowData",
-    value_type=aas_types.DataTypeDefXsd.STRING
-)
-'''
-#endregion
+
 
 # region real time data example submodel
 submodel_chiller_real_time = aas_types.Submodel(
     id="urn:zhaw:ims:chiller:543fsfds99342:realTime",
-    submodel_elements=[temperature, state, realtime_row_data_property]
+    submodel_elements=[temperature, state]
 )
-
-#endregion
-
-#region real time data log
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("zhaw_aas_server")
-
-# Define the lock to protect the shared data (submodel properties)
-submodel_realtime_data_lock = threading.Lock()
-
-# Function to simulate retrieving real-time values
-def get_realtime_values():
-    received_data = get_received_data()
-    if received_data is not None:
-        return received_data
-    else:
-        return{}
-
-# Define the update thread function
-def update_thread() -> None:
-    # List of submodels with real-time values
-    realtime_submodels = [
-        '''
-        submodel_chiller_row_realtime_data,
-        submodel_chiller_operation_realtime_data,
-        submodel_chiller_status_flag_realtime_data,
-        submodel_chiller_alarm_flag_realtime_data,
-        submodel_chiller_fault_realtime_data
-        '''
-    ]
-
-    while True:
-        with submodel_realtime_data_lock:
-            values = get_realtime_values()
-
-            logger.info("Updating real-time values: %s", values)
-
-            if values:  # Only update if the values dictionary is not empty
-                for submodel in realtime_submodels:
-                    for prop in submodel.submodel_elements:
-                        if prop.id_short in values:
-                            prop.value = values[prop.id_short]
-
-        time.sleep(5)  # Update every 5 seconds
-
-
-# Start the update thread
-update_thread = threading.Thread(target=update_thread)
-update_thread.start()
-
-#endregion
 
 #region Submodel identification
 
@@ -521,7 +413,46 @@ environment = aas_types.Environment(
                submodel_chiller_standard_technical_data,
                submodel_chiller_standard_circulating_fluid_system_data,
                submodel_chiller_standard_electrical_system_data
-               ]
+               ],
+    concept_descriptions=[
+        aas_types.ConceptDescription(
+            id="urn:zhaw:conceptDescription:temperature",
+            embedded_data_specifications=[
+                aas_types.EmbeddedDataSpecification(
+                    data_specification=aas_types.Reference(
+                        type=aas_types.ReferenceTypes.GLOBAL_REFERENCE,
+                        keys=[
+                            aas_types.Key(
+                                type=aas_types.KeyTypes.GLOBAL_REFERENCE,
+                                value="0112/2///61360_4#AAF927"
+                            )
+                        ]
+                    ),
+                    data_specification_content=aas_types.DataSpecificationIEC61360(
+                        preferred_name=[
+                            aas_types.LangString(
+                                language="en",
+                                text="tem"
+                            )
+                        ],
+                        short_name=[
+                            aas_types.LangString(
+                                language="en",
+                                text="p_water"
+                            )
+                        ],
+                        definition=[
+                            aas_types.LangString(
+                                language="en",
+                                text="pressure exerted on an object being completely embedded by water"
+                            )
+                        ],
+                        unit="Pa"
+                    )
+                )
+            ]
+        )
+    ]
 )
 #endregion
 
@@ -534,13 +465,8 @@ print(json.dumps(jsonable, indent=3))
 
 
 
-try:
-    while True:
-        current_data = get_received_data()
-        if current_data is not None:
-            print(f"global data: {current_data}")
 
-        time.sleep(1)
-except KeyboardInterrupt:
-    print("Terminating the script")
-    client.loop_stop()  # Stop the MQTT client loop
+while True:
+    print(f"global data:")
+
+    time.sleep(1)
